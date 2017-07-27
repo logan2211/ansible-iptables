@@ -1,0 +1,44 @@
+---
+# Copyright 2017, Logan Vig <logan2211@gmail.com>
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- include: test-create-containers.yml
+
+- name: Playbook for role testing
+  hosts: test_containers
+  roles:
+    - role: "{{ rolename | basename }}"
+  post_tasks:
+    - name: Get the iptables-save results
+      command: iptables-save
+      changed_when: false
+      register: iptables_save_output
+    - name: Get the ip6tables-save results
+      command: ip6tables-save
+      changed_when: false
+      register: ip6tables_save_output
+    - name: Check iptables operational status
+      assert:
+        that:
+          # Ensure that INPUT default policy is DROP in the filter table
+          - "{{ iptables_save_output | regex_replace('(.*\\*filter.*:INPUT DROP.*COMMIT.*)', 'true') | bool }}"
+          # Ensure rules exist in the DEFAULT_RULES chain
+          - "{{ '-A DEFAULT_RULES' in iptables_save_output.stdout }}"
+    - name: Check ip6tables operational status
+      assert:
+        that:
+          # Ensure that INPUT default policy is DROP in the filter table
+          - "{{ ip6tables_save_output | regex_replace('(.*\\*filter.*:INPUT DROP.*COMMIT.*)', 'true') | bool }}"
+          # Ensure rules exist in the DEFAULT_RULES chain
+          - "{{ '-A DEFAULT_RULES' in ip6tables_save_output.stdout }}"

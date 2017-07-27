@@ -1,0 +1,50 @@
+language: python
+# Test this later.
+cache:
+  timeout: 3600
+  pip: true
+  directories:
+    - $HOME/.docker
+# cache: pip
+services:
+  - docker
+env:
+  global:
+    - ANSIBLE_FORCE_COLOR=1
+    - docker_image=logan2211/docker-ci
+    - docker_command=/lib/systemd/systemd
+    - cache_dir=$HOME/.docker
+  matrix:
+    - TOXENV=linters
+      CACHE_NAME=linters
+    - >
+      TOXENV=functional_2.2
+      docker_image_tag=ubuntu-xenial
+      CACHE_NAME=xenial
+    - >
+      TOXENV=functional_2.2
+      docker_image_tag=centos-7
+      CACHE_NAME=cent7
+    - >
+      TOXENV=functional_stable
+      docker_image_tag=ubuntu-xenial
+      CACHE_NAME=xenial
+    - >
+      TOXENV=functional_stable
+      docker_image_tag=centos-7
+      CACHE_NAME=cent7
+before_install:
+  # Load cached docker images
+  - if [[ -d ${cache_dir} ]]; then ls ${cache_dir}/*.tar.gz | xargs -I {file} sh -c "zcat {file} | docker load"; fi
+  - if [[ -n ${docker_image_tag} ]]; then docker pull ${docker_image}:${docker_image_tag}; fi
+install:
+  - pip install tox
+script:
+  - tox
+before_cache:
+  # Save tagged docker images
+  - >
+    mkdir -p ${cache_dir} && docker images -a --filter='dangling=false' --format '{{.Repository}}:{{.Tag}} {{.ID}}'
+    | xargs -n 2 -t sh -c 'test -e ${cache_dir}/$1.tar.gz || docker save $0 | gzip -2 > ${cache_dir}/$1.tar.gz'
+notifications:
+  email: false

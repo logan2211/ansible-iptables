@@ -1,0 +1,15 @@
+# {{ ansible_managed }}
+{% set base_rules_dir = 'base_' ~ nf_proto %}
+{% set group_rules_dir = 'group_' ~ nf_proto %}
+{% for nf_table in nf_tables %}
+*{{ nf_table }}
+{%   set base_filename = [iptables_base_ruleset, nf_table] | join('_') ~ '.j2' %}
+{%   include base_rules_dir ~ '/' ~ base_filename %}
+
+{%   for group in group_names %}
+{%     set group_filename = [group, nf_table] | join('_') ~ '.j2' %}
+{%     include group_rules_dir ~ '/' ~ group_filename ignore missing %}
+
+{%   endfor %}
+COMMIT
+{% endfor %}
