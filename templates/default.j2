@@ -1,15 +1,25 @@
 # {{ ansible_managed }}
-{% set base_rules_dir = 'base_' ~ nf_proto %}
-{% set group_rules_dir = 'group_' ~ nf_proto %}
-{% for nf_table in nf_tables %}
-*{{ nf_table }}
-{%   set base_filename = [iptables_base_ruleset, nf_table] | join('_') ~ '.j2' %}
-{%   include base_rules_dir ~ '/' ~ base_filename %}
-
-{%   for group in group_names %}
-{%     set group_filename = [group, nf_table] | join('_') ~ '.j2' %}
-{%     include group_rules_dir ~ '/' ~ group_filename ignore missing %}
-
+{# This template will render an iptables-restore file for a list of
+   iptables_rules #}
+{# Loop over a list of unique "tables" being configured #}
+{% for table in iptables_rules | map(attribute='table') | unique | list %}
+*{{ table }}
+{# The list is reversed for chains because the lowest priority chains need to
+   be outputted first, then the higher priority chains supersede #}
+{%   for chain in iptables_rules |
+                  selectattr('table', 'equalto', table) |
+                  map(attribute='chains') |
+                  select('defined') |
+                  reverse |
+                  sum(start=[]) %}
+:{{ chain.name }} {{ chain.policy | default('-') }} [{{ chain.packets | default('0') }}:{{ chain.bytes | default('0') }}]
+{%   endfor %}
+{%   for rule in iptables_rules |
+                  selectattr('table', 'equalto', table) |
+                  map(attribute='rules') |
+                  select('defined') |
+                  sum(start=[]) %}
+{{ rule }}
 {%   endfor %}
 COMMIT
 {% endfor %}

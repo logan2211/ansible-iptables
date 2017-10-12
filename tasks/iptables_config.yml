@@ -15,9 +15,15 @@
 
 - name: Drop the iptables rules
   template:
-    src: "{{ rules_src }}"
-    dest: "{{ rules_dest }}"
+    src: "{{ iptables_template.src | default(iptables_default_template) }}"
+    dest: "{{ iptables_template.dest }}"
     owner: root
     group: root
-    mode: '0755'
-  notify: Reload tables
+    mode: '0644'
+  notify: Reload iptables
+  vars:
+    iptables_rules: >-
+      {{ iptables_rule_defs |
+         selectattr('protocol', 'equalto', iptables_template.protocol) |
+         sort(attribute='order') |
+         list }}
