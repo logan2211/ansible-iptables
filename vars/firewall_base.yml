@@ -1,0 +1,52 @@
+---
+# Copyright 2017, Logan Vig <logan2211@gmail.com>
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+firewall_base:
+  - table: filter
+    protocol: ipv4
+    order: 9999
+    chains:
+      - name: INPUT
+        policy: DROP
+      - name: FORWARD
+        policy: ACCEPT
+      - name: OUTPUT
+        policy: ACCEPT
+      - name: DEFAULT_RULES
+    rules:
+      - '-A INPUT -j DEFAULT_RULES'
+      - '-A DEFAULT_RULES -i lo -j ACCEPT'
+      - '-A DEFAULT_RULES -p udp -m udp --dport 33434:33534 -m limit --limit 3/sec --limit-burst 10 -j ACCEPT'
+      - '-A DEFAULT_RULES -p icmp -m limit --limit 3/sec --limit-burst 25 -j ACCEPT'
+      - '-A DEFAULT_RULES -m state --state RELATED,ESTABLISHED -j ACCEPT'
+  - table: filter
+    protocol: ipv6
+    order: 9999
+    chains:
+      - name: INPUT
+        policy: DROP
+      - name: FORWARD
+        policy: ACCEPT
+      - name: OUTPUT
+        policy: ACCEPT
+      - name: DEFAULT_RULES
+    rules:
+      - '-A INPUT -j DEFAULT_RULES'
+      - '-A DEFAULT_RULES -s ff00::/8 -j ACCEPT'
+      - '-A DEFAULT_RULES -s fe80::/10 -j ACCEPT'
+      - '-A DEFAULT_RULES -i lo -j ACCEPT'
+      - '-A DEFAULT_RULES -p udp -m udp --dport 33434:33534 -m limit --limit 3/sec --limit-burst 10 -j ACCEPT'
+      - '-A DEFAULT_RULES -p ipv6-icmp -m limit --limit 3/sec --limit-burst 25 -j ACCEPT'
+      - '-A DEFAULT_RULES -m state --state RELATED,ESTABLISHED -j ACCEPT'

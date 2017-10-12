@@ -1,0 +1,48 @@
+---
+# Copyright 2017, Logan Vig <logan2211@gmail.com>
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+- name: Build a list of rules defined in hostvars
+  set_fact:
+    iptables_rule_defs: |-
+      {% if iptables_search_enabled | bool %}
+      {%   set _rules_search_hits = hostvars[inventory_hostname].keys() |
+                                    select('match', '^' ~ iptables_search_prefix ~ '.*') |
+                                    list
+      %}
+      {% endif %}
+      {% set _rules = _rules_search_hits |
+                     default([]) |
+                     union(iptables_rule_vars) |
+                     map('extract', hostvars[inventory_hostname]) |
+                     sum(start=[]) |
+                     list
+      %}
+      {% set _rules = _rules | union(iptables_rule_definitions) %}
+      {# Since the 'order' attribute is optional we need to loop thru #}
+      {# and default it if it is not defined before sorting. #}
+      {% set _var = [] %}
+      {% for _rule_def in _rules %}
+      {%   set _protocol = _rule_def.protocol | default('ipv4') %}
+      {%   set _order = _rule_def.order | default(50) | int %}
+      {%   set _table = _rule_def.table | default('filter') %}
+      {%   set _ = _rule_def.update({
+             'protocol': _protocol,
+             'order': _order,
+             'table': _table
+           })
+      %}
+      {%   set _ = _var.append(_rule_def) %}
+      {% endfor %}
+      {{ _var }}

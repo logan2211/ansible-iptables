@@ -18,16 +18,33 @@ iptables_iptables_managed: "{{ iptables_v4_save_file is defined }}"
 # Manage the IPv6 tables
 iptables_ip6tables_managed: "{{ iptables_v6_save_file is defined }}"
 
+# When changes are applied to the on-disk rules, apply them to the kernel
+# operational iptables as well.
+iptables_apply_changes: yes
+
 # Template used as the base iptables-save template file
-iptables_base_ruleset: default
-iptables_base_template: "{{ iptables_base_ruleset }}.j2"
+iptables_default_template: default.j2
+
+iptables_templates:
+  - protocol: ipv4
+    dest: "{{ iptables_v4_save_file }}"
+    enabled: "{{ iptables_iptables_managed }}"
+  - protocol: ipv6
+    dest: "{{ iptables_v6_save_file }}"
+    enabled: "{{ iptables_ip6tables_managed }}"
 
 iptables_package_state: latest
 
-# Tables managed by the templates
-iptables_v4_tables:
-  - nat
-  - filter
+# Rules are loaded from hostvars matching this prefix
+iptables_search_enabled: yes
+iptables_search_prefix: firewall_
 
-iptables_v6_tables:
-  - filter
+# Rules can be loaded directly from vars listed here instead of or in addition
+# to the var prefix search functionality.
+iptables_rule_vars: []
+
+# Rule definitions provided directly instead of loaded from vars
+iptables_rule_definitions: []
+
+iptables_rules_files:
+  - firewall_base.yml

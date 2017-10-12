@@ -26,20 +26,15 @@
 
 - include: "iptables_install_{{ ansible_pkg_mgr }}.yml"
 
+- name: Load the iptables rules vars
+  include_vars: "{{ item }}"
+  with_items: "{{ iptables_rules_files }}"
+
+- include: iptables_rule_facts.yml
+
 - include: iptables_config.yml
-  vars:
-    nf_proto: "{{ item.nf_proto }}"
-    nf_tables: "{{ item.nf_tables }}"
-    rules_src: "{{ iptables_base_template }}"
-    rules_dest: "{{ item.rules_dest }}"
-  with_items:
-    - nf_proto: ipv4
-      nf_tables: "{{ iptables_v4_tables }}"
-      rules_dest: "{{ iptables_v4_save_file }}"
-      enabled: "{{ iptables_iptables_managed }}"
-    - nf_proto: ipv6
-      nf_tables: "{{ iptables_v6_tables }}"
-      rules_dest: "{{ iptables_v6_save_file }}"
-      enabled: "{{ iptables_ip6tables_managed }}"
+  with_items: "{{ iptables_templates }}"
+  loop_control:
+    loop_var: iptables_template
   when:
-    - "item.enabled | bool"
+    - iptables_template.enabled | bool

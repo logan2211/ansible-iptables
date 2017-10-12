@@ -17,4 +17,6 @@
   listen: Reload iptables
   command: netfilter-persistent start
   changed_when: false
-  when: "ansible_os_family == 'Debian'"
+  when:
+    - "ansible_os_family == 'Debian'"
+    - iptables_apply_changes | bool
