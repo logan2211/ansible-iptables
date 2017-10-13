@@ -12,3 +12,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+iptables_distro_packages:
+  - iptables
+  - iptables-services
+
+iptables_v4_save_file: /etc/sysconfig/iptables
+iptables_v6_save_file: /etc/sysconfig/ip6tables

@@ -21,18 +21,18 @@ env:
       TOXENV=functional_2.2
       docker_image_tag=ubuntu-xenial
       CACHE_NAME=xenial
-#    - >
-#      TOXENV=functional_2.2
-#      docker_image_tag=centos-7
-#      CACHE_NAME=cent7
+    - >
+      TOXENV=functional_2.2
+      docker_image_tag=centos-7
+      CACHE_NAME=cent7
     - >
       TOXENV=functional_stable
       docker_image_tag=ubuntu-xenial
       CACHE_NAME=xenial
-#    - >
-#      TOXENV=functional_stable
-#      docker_image_tag=centos-7
-#      CACHE_NAME=cent7
+    - >
+      TOXENV=functional_stable
+      docker_image_tag=centos-7
+      CACHE_NAME=cent7
 before_install:
   # Load cached docker images
   - if [[ -d ${cache_dir} ]]; then ls ${cache_dir}/*.tar.gz | xargs -I {file} sh -c "zcat {file} | docker load"; fi
