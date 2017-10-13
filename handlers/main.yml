@@ -20,3 +20,15 @@
   when:
     - "ansible_os_family == 'Debian'"
     - iptables_apply_changes | bool
+
+- name: Reload iptables/ip6tables rules (RedHat)
+  listen: Reload iptables
+  service:
+    name: "{{ item }}"
+    state: reloaded
+  with_items:
+    - iptables
+    - ip6tables
+  when:
+    - "ansible_os_family == 'RedHat'"
+    - iptables_apply_changes | bool
