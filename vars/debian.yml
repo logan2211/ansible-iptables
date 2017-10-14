@@ -19,3 +19,6 @@ cache_timeout: 600
 iptables_distro_packages:
   - iptables
   - iptables-persistent
+
+iptables_v4_save_file: /etc/iptables/rules.v4
+iptables_v6_save_file: /etc/iptables/rules.v6
