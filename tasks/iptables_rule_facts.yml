@@ -17,7 +17,7 @@
   set_fact:
     iptables_rule_defs: |-
       {% if iptables_search_enabled | bool %}
-      {%   set _rules_search_hits = hostvars[inventory_hostname].keys() |
+      {%   set _rules_search_hits = vars.keys() |
                                     select('match', '^' ~ iptables_search_prefix ~ '.*') |
                                     list
       %}
@@ -25,7 +25,7 @@
       {% set _rules = _rules_search_hits |
                      default([]) |
                      union(iptables_rule_vars) |
-                     map('extract', hostvars[inventory_hostname]) |
+                     map('extract', vars) |
                      sum(start=[]) |
                      list
       %}
