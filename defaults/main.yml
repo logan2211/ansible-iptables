@@ -46,5 +46,8 @@ iptables_rule_vars: []
 # Rule definitions provided directly instead of loaded from vars
 iptables_rule_definitions: []
 
-iptables_rules_files:
-  - firewall_base.yml
+# Base rules loaded by the role
+iptables_vars_files: "{{ _iptables_vars_files_base +
+                         iptables_vars_files_extra }}"
+
+iptables_vars_files_extra: []

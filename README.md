@@ -13,7 +13,7 @@ An ansible role to install and configure persistent iptables.
 #### Rule Definitions
 
 iptables rule definitions can be configured several ways:
-* vars files are loaded from `iptables_rules_files`
+* vars file list loaded from `iptables_vars_files_extra`
 * A list of rule definitions can be added to `iptables_rule_definitions`
 * Lists of rule definitions are loaded from vars prefixed with `firewall_` (ex. `firewall_webserver`)
 * A list of variables containing rule definition lists can be passed in `iptables_rule_vars`
