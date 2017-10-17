@@ -28,7 +28,7 @@
 
 - name: Load the iptables rules vars
   include_vars: "{{ item }}"
-  with_items: "{{ iptables_rules_files }}"
+  with_items: "{{ iptables_vars_files }}"
 
 - include: iptables_rule_facts.yml
 
