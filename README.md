@@ -76,7 +76,7 @@ Note: All of the attributes on rule definitions are _optional_.
 
 ##### Ordering rules allows you to provide higher precedence overrides, for example we will override the default firewall in `vars/firewall_base.yml` to change the INPUT chain policy to "ACCEPT" instead of "DENY".
 ```yaml
-# THe default order of '50' will override the firewall_base order value of '9999'.
+# The default order of '50' will override the firewall_base order value of '9999'.
 - hosts: all
   vars:
     iptables_rule_definitions:

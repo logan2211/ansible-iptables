@@ -13,6 +13,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Playbook vars are not templated into hostvars, however they are stored in the
+# dict called "vars" without any jinja resolved. This will set_fact them into
+# hostvars and resolve any jinja in the process.
+- name: Set facts for the firewall search results missing from hostvars
+  set_fact:
+    "{{ item }}": "{{ vars[item] }}"
+  when:
+    - iptables_search_enabled | bool
+    - item not in hostvars[inventory_hostname].keys()
+  with_items: "{{ vars.keys() | select('match', '^' ~ iptables_search_prefix ~ '.*') | list }}"
+
 - name: Build a list of rules defined in hostvars
   set_fact:
     iptables_rule_defs: |-

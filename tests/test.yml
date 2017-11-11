@@ -35,6 +35,9 @@
           - "{{ iptables_save_output | regex_replace('(.*\\*filter.*:INPUT DROP.*COMMIT.*)', 'true') | bool }}"
           # Ensure rules exist in the DEFAULT_RULES chain
           - "{{ '-A DEFAULT_RULES' in iptables_save_output.stdout }}"
+          # Test playbook chains
+          - "{{ ':PLAYBOOK_NO_JINJA' in iptables_save_output.stdout }}"
+          - "{{ ':PLAYBOOK_TEMPLATED_CHAIN' in iptables_save_output.stdout }}"
     - name: Check ip6tables operational status
       assert:
         that:
@@ -42,3 +45,11 @@
           - "{{ ip6tables_save_output | regex_replace('(.*\\*filter.*:INPUT DROP.*COMMIT.*)', 'true') | bool }}"
           # Ensure rules exist in the DEFAULT_RULES chain
           - "{{ '-A DEFAULT_RULES' in ip6tables_save_output.stdout }}"
+  vars:
+    firewall_playbook_chain_notemplate:
+      - chains:
+          - name: PLAYBOOK_NO_JINJA
+    playbook_templated_chain: PLAYBOOK_TEMPLATED_CHAIN
+    firewall_playbook_chain_template:
+      - chains:
+          - name: "{{ playbook_templated_chain }}"
