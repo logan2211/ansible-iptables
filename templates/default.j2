@@ -17,8 +17,10 @@
 {%   for rule in iptables_rules |
                   selectattr('table', 'equalto', table) |
                   map(attribute='rules') |
-                  select('defined') |
-                  sum(start=[]) %}
+                  select('defined') %}
+{%     if rule is not string %}
+{%       set rule = rule | join('\n') %}
+{%     endif %}
 {{ rule }}
 {%   endfor %}
 COMMIT
