@@ -15,7 +15,5 @@
 
 - name: Install iptables OS packages (yum)
   yum:
-    name: "{{ item }}"
+    name: "{{ iptables_distro_packages }}"
     state: "{{ iptables_package_state }}"
-  with_items:
-    - "{{ iptables_distro_packages }}"

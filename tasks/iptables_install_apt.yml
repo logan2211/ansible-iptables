@@ -15,8 +15,7 @@
 
 - name: Install the iptables OS Packages
   apt:
-    name: "{{ item }}"
+    name: "{{ iptables_distro_packages }}"
     state: "{{ iptables_package_state }}"
     update_cache: yes
     cache_valid_time: "{{ cache_timeout }}"
-  with_items: "{{ iptables_distro_packages }}"
