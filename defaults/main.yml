@@ -29,9 +29,11 @@ iptables_templates:
   - protocol: ipv4
     dest: "{{ iptables_v4_save_file }}"
     enabled: "{{ iptables_iptables_managed }}"
+    validate_command: 'iptables-restore --test %s'
   - protocol: ipv6
     dest: "{{ iptables_v6_save_file }}"
     enabled: "{{ iptables_ip6tables_managed }}"
+    validate_command: 'ip6tables-restore --test %s'
 
 iptables_package_state: latest
 
