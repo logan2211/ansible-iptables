@@ -1,28 +1,37 @@
+---
+dist: bionic
 language: python
-# Test this later.
 cache:
   timeout: 3600
   pip: true
   directories:
     - $HOME/.docker
-# cache: pip
 services:
   - docker
 
-_ubuntu_build: &ubuntu_build
+# Distros
+_ubuntu_xenial_build: &ubuntu_xenial_build
   docker_image_tag: ubuntu-xenial
   CACHE_NAME: xenial
-  TOXENV: functional_stable
+
+_ubuntu_bionic_build: &ubuntu_bionic_build
+  docker_image_tag: ubuntu-bionic
+  CACHE_NAME: bionic
+
+_ubuntu_focal_build: &ubuntu_focal_build
+  docker_image_tag: ubuntu-focal
+  CACHE_NAME: focal
 
 _centos_build: &centos_build
   docker_image_tag: centos-7
   CACHE_NAME: cent7
-  TOXENV: functional_stable
 
-_debian_build: &debian_build
-  docker_image_tag: debian-stretch
-  CACHE_NAME: debian9
-  TOXENV: functional_stable
+# Ansible versions
+_ansible_27_build: &ansible_27_build
+  ansible_version: "'ansible>=2.7,<2.8'"
+
+_ansible_28_build: &ansible_28_build
+  ansible_version: "'ansible>=2.8,<2.9'"
 
 env:
   global:
@@ -30,61 +39,43 @@ env:
     - docker_image=quay.io/loganv/docker-ci
     - docker_command=/lib/systemd/systemd
     - cache_dir=$HOME/.docker
+    - ansible_version=ansible
 
 matrix:
   fast_finish: true
   include:
+    # ANSIBLE 2.8
     - env:
-        TOXENV: linters
-        CACHE_NAME: linters
-    # ANSIBLE 2.3
+        <<: *ubuntu_xenial_build
+        <<: *ansible_28_build
     - env:
-        <<: *ubuntu_build
-        TOXENV: functional_2.3
+        <<: *ubuntu_bionic_build
+        <<: *ansible_28_build
     - env:
-        <<: *centos_build
-        TOXENV: functional_2.3
-    - env:
-        <<: *debian_build
-        TOXENV: functional_2.3
-    # ANSIBLE 2.4
-    - env:
-        <<: *ubuntu_build
-        TOXENV: functional_2.4
+        <<: *ubuntu_focal_build
+        <<: *ansible_28_build
     - env:
         <<: *centos_build
-        TOXENV: functional_2.4
-    - env:
-        <<: *debian_build
-        TOXENV: functional_2.4
-    # ANSIBLE 2.5
-    - env:
-        <<: *ubuntu_build
-        TOXENV: functional_2.5
-    - env:
-        <<: *centos_build
-        TOXENV: functional_2.5
-    - env:
-        <<: *debian_build
-        TOXENV: functional_2.5
+        <<: *ansible_28_build
     # ANSIBLE STABLE
     - env:
-        <<: *ubuntu_build
+        <<: *ubuntu_xenial_build
+    - env:
+        <<: *ubuntu_bionic_build
+    - env:
+        <<: *ubuntu_focal_build
     - env:
         <<: *centos_build
-    - env:
-        <<: *debian_build
 
 before_install:
   # Load cached docker images
   - if [[ -d ${cache_dir} ]]; then ls ${cache_dir}/*.tar.gz | xargs -I {file} sh -c "zcat {file} | docker load"; fi
   - if [[ -n ${docker_image_tag} ]]; then docker pull ${docker_image}:${docker_image_tag}; fi
 install:
-  - pip install tox
-before_script:
-  - curl -o ${PWD}/tox.ini https://gist.githubusercontent.com/Logan2211/c5f38423b085fbea78392f1ee10700d5/raw/tox.ini
+  - pip install -r test-requirements.txt ${ansible_version}
 script:
-  - tox
+  - sudo modprobe ip6table_filter
+  - molecule test
 before_cache:
   # Save tagged docker images
   - >
