@@ -1,0 +1,18 @@
+---
+
+# Test templated firweall search from group vars
+group_templated_chain: GROUP_VAR_TEMPLATED_CHAIN
+firewall_group_vars_templated:
+  - chains:
+      - name: "{{ group_templated_chain }}"
+
+firewall_testing:
+  # Test rules as strings
+  - chains:
+      - name: STRING_RULES
+    rules: |
+      -A STRING_RULES -j ACCEPT
+  - chains:
+      - name: LIST_RULES
+    rules:
+      - '-A LIST_RULES -j ACCEPT'
