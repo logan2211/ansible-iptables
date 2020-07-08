@@ -28,6 +28,9 @@
           # Test string/list based rules
           - "{{ '-A STRING_RULES' in iptables_save_output.stdout }}"
           - "{{ '-A LIST_RULES' in iptables_save_output.stdout }}"
+          # Test playbook chains
+          - "{{ ':PLAYBOOK_NO_JINJA' in iptables_save_output.stdout }}"
+          - "{{ ':PLAYBOOK_TEMPLATED_CHAIN' in iptables_save_output.stdout }}"
     - name: Check ip6tables operational status
       assert:
         that:
@@ -35,3 +38,6 @@
           - "{{ ip6tables_save_output | regex_replace('(.*\\*filter.*:INPUT DROP.*COMMIT.*)', 'true') | bool }}"
           # Ensure rules exist in the DEFAULT_RULES chain
           - "{{ '-A DEFAULT_RULES' in ip6tables_save_output.stdout }}"
+          # Test playbook chains
+          - "{{ ':PLAYBOOK_NO_JINJA' in iptables_save_output.stdout }}"
+          - "{{ ':PLAYBOOK_TEMPLATED_CHAIN' in iptables_save_output.stdout }}"

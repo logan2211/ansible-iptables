@@ -17,31 +17,34 @@
   set_fact:
     iptables_rule_defs: |-
       {% if iptables_search_enabled | bool %}
-      {%   set _rules_search_hits = hostvars[inventory_hostname].keys() |
+      {%   set _rules_search_hits = vars.keys() |
                                     select('match', '^' ~ iptables_search_prefix ~ '.*') |
                                     list
       %}
       {% endif %}
-      {% set _rules = _rules_search_hits |
-                     default([]) |
-                     union(iptables_rule_vars) |
-                     map('extract', hostvars[inventory_hostname]) |
-                     sum(start=[]) |
-                     list
-      %}
-      {% set _rules = _rules | union(iptables_rule_definitions) %}
+      {# Add the static rule definitions #}
+      {% set _rules = iptables_rule_definitions %}
+      {# Add rules from search vars (ie. firewall_*) and also a list of vars
+         defined in iptables_rule_vars
+      #}
+      {% for _rule in _rules_search_hits |
+                      default([]) |
+                      union(iptables_rule_vars) |
+                      list %}
+      {%   set _ = _rules.append(lookup('vars', _rule)) %}
+      {% endfor %}
       {# Since the 'order' attribute is optional we need to loop thru #}
       {# and default it if it is not defined before sorting. #}
       {% set _var = [] %}
-      {% for _rule_def in _rules %}
+      {% for _rule_def in _rules | sum(start=[]) %}
       {%   set _protocol = _rule_def.protocol | default('ipv4') %}
       {%   set _order = _rule_def.order | default(50) | int %}
       {%   set _table = _rule_def.table | default('filter') %}
       {%   set _ = _rule_def.update({
-             'protocol': _protocol,
-             'order': _order,
-             'table': _table
-           })
+            'protocol': _protocol,
+            'order': _order,
+            'table': _table
+          })
       %}
       {%   set _ = _var.append(_rule_def) %}
       {% endfor %}

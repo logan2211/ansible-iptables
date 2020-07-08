@@ -3,3 +3,11 @@
   hosts: all
   roles:
     - role: "{{ playbook_dir | dirname | dirname | basename }}"
+  vars:
+    firewall_playbook_chain_notemplate:
+      - chains:
+          - name: PLAYBOOK_NO_JINJA
+    playbook_templated_chain: PLAYBOOK_TEMPLATED_CHAIN
+    firewall_playbook_chain_template:
+      - chains:
+          - name: "{{ playbook_templated_chain }}"
