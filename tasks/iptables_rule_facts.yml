@@ -41,10 +41,10 @@
       {%   set _order = _rule_def.order | default(50) | int %}
       {%   set _table = _rule_def.table | default('filter') %}
       {%   set _ = _rule_def.update({
-            'protocol': _protocol,
-            'order': _order,
-            'table': _table
-          })
+             'protocol': _protocol,
+             'order': _order,
+             'table': _table
+           })
       %}
       {%   set _ = _var.append(_rule_def) %}
       {% endfor %}
