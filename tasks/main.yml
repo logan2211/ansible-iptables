@@ -21,18 +21,39 @@
     - "{{ ansible_os_family | lower }}-{{ ansible_distribution_major_version | lower }}.yml"
     - "{{ ansible_distribution | lower }}.yml"
     - "{{ ansible_os_family | lower }}.yml"
-  tags:
-    - always
+  tags: always
 
-- include: "iptables_install_{{ ansible_pkg_mgr }}.yml"
+- name: Install iptables package
+  tags: always
+  include_tasks: 
+    file: "iptables_install_{{ ansible_pkg_mgr }}.yml"
+    apply:
+      tags:
+         - iptables
+         - firewall
 
 - name: Load the iptables rules vars
   include_vars: "{{ item }}"
   with_items: "{{ iptables_vars_files }}"
+  tags: always
 
-- include: iptables_rule_facts.yml
+- name: Build rule for iptables
+  tags: always
+  include_tasks:
+    file: iptables_rule_facts.yml
+    apply:
+      tags:
+         - iptables
+         - firewall
 
-- include: iptables_config.yml
+- name: Configure IP Tables
+  tags: always
+  include_tasks:  
+    file: iptables_config.yml
+    apply:
+      tags:
+         - iptables
+         - firewall
   with_items: "{{ iptables_templates }}"
   loop_control:
     loop_var: iptables_template
