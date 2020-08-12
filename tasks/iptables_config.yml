@@ -20,6 +20,7 @@
     owner: root
     group: root
     mode: '0644'
+    validate: "{{ iptables_template.validate_command | default(omit) }}"
   notify: Reload iptables
   vars:
     iptables_rules: >-
