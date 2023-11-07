@@ -59,3 +59,5 @@
     loop_var: iptables_template
   when:
     - iptables_template.enabled | bool
+
+- meta: flush_handlers
