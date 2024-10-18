@@ -30,7 +30,7 @@
       {% for _rule in _rules_search_hits |
                       default([]) |
                       union(iptables_rule_vars) |
-                      list %}
+                      list | sort %}
       {%   set _ = _rules.append(lookup('vars', _rule)) %}
       {% endfor %}
       {# Since the 'order' attribute is optional we need to loop thru #}
