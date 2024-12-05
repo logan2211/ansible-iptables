@@ -16,21 +16,19 @@
 - name: Gather variables for each operating system
   include_vars: "{{ item }}"
   with_first_found:
-    - "{{ ansible_distribution | lower }}-{{ ansible_distribution_version | lower }}.yml"
-    - "{{ ansible_distribution | lower }}-{{ ansible_distribution_major_version | lower }}.yml"
-    - "{{ ansible_os_family | lower }}-{{ ansible_distribution_major_version | lower }}.yml"
-    - "{{ ansible_distribution | lower }}.yml"
-    - "{{ ansible_os_family | lower }}.yml"
+    - "{{ ansible_facts['distribution'] | lower }}-{{ ansible_facts['distribution_version'] | lower }}.yml"
+    - "{{ ansible_facts['distribution'] | lower }}-{{ ansible_facts['distribution_major_version'] | lower }}.yml"
+    - "{{ ansible_facts['os_family'] | lower }}-{{ ansible_facts['distribution_major_version'] | lower }}.yml"
+    - "{{ ansible_facts['distribution'] | lower }}.yml"
+    - "{{ ansible_facts['os_family'] | lower }}.yml"
   tags: always
 
-- name: Install iptables package
-  tags: always
-  include_tasks: 
-    file: "iptables_install_{{ ansible_pkg_mgr }}.yml"
-    apply:
-      tags:
-         - iptables
-         - firewall
+- name: Install the iptables OS Packages
+  package:
+    name: "{{ iptables_distro_packages }}"
+    state: "{{ iptables_package_state }}"
+    update_cache: "{{ (ansible_facts['pkg_mgr'] == 'apt') }}"
+    cache_valid_time: "{{ (ansible_facts['pkg_mgr'] == 'apt') | ternary(cache_timeout, omit) }}"
 
 - name: Load the iptables rules vars
   include_vars: "{{ item }}"
@@ -48,7 +46,7 @@
 
 - name: Configure IP Tables
   tags: always
-  include_tasks:  
+  include_tasks:
     file: iptables_config.yml
     apply:
       tags:
