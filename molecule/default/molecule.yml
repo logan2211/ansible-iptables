@@ -19,7 +19,7 @@ provisioner:
       inject_facts_as_vars: false
 platforms:
   - name: iptables
-    image: "${docker_user:-quay.io/gotmax23}/${docker_image_tag:-ubuntu-systemd:focal}"
+    image: "${docker_user:-quay.io/gotmax23}/${docker_image_tag:-ubuntu-systemd:jammy}"
     command: ""
     pre_build_image: true
     groups:

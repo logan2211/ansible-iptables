@@ -20,8 +20,6 @@ jobs:
             user: quay.io/gotmax23
           - tag: debian-systemd:12
             user: quay.io/gotmax23
-          - tag: ubuntu-systemd:20.04
-            user: quay.io/gotmax23
           - tag: ubuntu-systemd:22.04
             user: quay.io/gotmax23
         python-version:
