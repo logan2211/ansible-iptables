@@ -1,21 +1,27 @@
 ---
+lint: |
+  set -e
+  yamllint .
+  ansible-lint -vv --exclude=.tox --exclude=molecule/default/converge.yml -x 204,208
 dependency:
   name: galaxy
 driver:
   name: docker
-platforms:
-  - name: instance
-    image: "${docker_image:-quay.io/loganv/docker-ci}:${docker_image_tag:-ubuntu-focal}"
-    user: root
-    command: ${docker_command:-/lib/systemd/systemd}
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-    privileged: true
-    pre_build_image: true
-lint: |
-  set -e
-  yamllint .
-provisioner:
-  name: ansible
 verifier:
   name: ansible
+provisioner:
+  name: ansible
+  options:
+    v: True
+  log: True
+  config_options:
+    defaults:
+      inject_facts_as_vars: true
+platforms:
+  - name: iptables
+    image: "${docker_user:-quay.io/gotmax23}/${docker_image_tag:-ubuntu-systemd:focal}"
+    command: ""
+    pre_build_image: true
+    groups:
+      - all
+    privileged: true

@@ -25,7 +25,7 @@
 
 - name: Install iptables package
   tags: always
-  include_tasks: 
+  include_tasks:
     file: "iptables_install_{{ ansible_pkg_mgr }}.yml"
     apply:
       tags:
@@ -48,7 +48,7 @@
 
 - name: Configure IP Tables
   tags: always
-  include_tasks:  
+  include_tasks:
     file: iptables_config.yml
     apply:
       tags:

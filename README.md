@@ -2,7 +2,7 @@
 
 An ansible role to install and configure persistent iptables.
 
-[![Build Status](https://travis-ci.org/Logan2211/ansible-iptables.svg?branch=master)](https://travis-ci.org/Logan2211/ansible-iptables)
+![Build Status](https://github.com/bbc/ansible-iptables/actions/workflows/main.yml/badge.svg?branch=master)
 
 #### Requirements
 
