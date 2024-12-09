@@ -5,12 +5,14 @@ bashate>=0.2 # Apache-2.0
 flake8<2.6.0,>=2.5.4 # MIT
 
 # Molecule tests
-docker
-molecule
-ansible-lint
+docker<=7.0.0
+molecule==5.1.0
+molecule-plugins==23.5.0
+ansible-lint==6.19.0
 
 #required for dns lookup testing
 dnspython
 
 #required for ansible ipaddr filter
 netaddr
+requests<=2.31.0

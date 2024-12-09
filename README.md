@@ -2,14 +2,14 @@
 
 An ansible role to install and configure persistent iptables.
 
-[![Build Status](https://travis-ci.org/Logan2211/ansible-iptables.svg?branch=master)](https://travis-ci.org/Logan2211/ansible-iptables)
+![Build Status](https://github.com/logan2211/ansible-iptables/actions/workflows/main.yml/badge.svg?branch=master)
 
 #### Requirements
 
 ##### Supported Operating Systems
-* Ubuntu 16.04
-* RHEL/CentOS 7
-* Debian 9
+* Ubuntu 22.04
+* RHEL/CentOS 9
+* Debian 12
 
 #### Rule Definitions
 
